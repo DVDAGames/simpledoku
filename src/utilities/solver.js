@@ -13,23 +13,37 @@ export default class Solver {
   checkSolution() {
     console.log('cells:', this.cells);
 
+    const validLengths = this.checkArrayLengths();
+
     const noDuplicates = this.checkForDuplicates();
 
+    const validValues = this.checkForValidValues();
+
+    console.log('validLengths:', validLengths);
     console.log('noDuplicates:', noDuplicates);
+    console.log('validValues:', validValues);
 
-    if(noDuplicates) {
-      const validValues = this.checkForValidValues();
+    return (validLengths && noDuplicates && validValues);
+  }
 
-      console.log('validValues:', validValues);
+  checkArrayLengths() {
+    const cells = this.cells;
 
-      if(validValues) {
-        return true;
+    if(cells) {
+      let check;
+
+      for(const prop in cells) {
+        if(cells.hasOwnProperty(prop)) {
+          if(cells[prop].length === 9) {
+            check = cells[prop].every(section, sectionIndex) => {
+              return section.length === 9;
+            });
+          }
+        }
       }
 
-      return false;
+      return check;
     }
-
-    return false;
   }
 
   checkForValidValues() {
