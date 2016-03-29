@@ -3,7 +3,9 @@ require('./app.scss');
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { objectHasOwnValue } from './utils/utils';
+import Solver from './utilities/solver';
+
+import { objectHasOwnValue } from './utilities/utils';
 
 const App = React.createClass({
   keyBoardArrowConstants: {
@@ -13,21 +15,6 @@ const App = React.createClass({
     RIGHT: 'ArrowRight'
   },
   startGame() {
-
-    /*
-    var easyPuzzle = [
-      [5, 3, 0, 0, 7, 0, 0, 0, 0],
-      [6, 0, 0, 1, 9, 5, 0, 0, 0],
-      [0, 9, 8, 0, 0, 0, 0, 6, 0],
-      [8, 0, 0, 0, 6, 0, 0, 0, 3],
-      [4, 0, 0, 8, 0, 3, 0, 0, 1],
-      [7, 0, 0, 0, 2, 0, 0, 0, 6],
-      [0, 6, 0, 0, 0, 0, 2, 8, 0],
-      [0, 0, 0, 4, 1, 9, 0, 0, 5],
-      [0, 0, 0, 0, 8, 0, 0, 7, 9]
-    ];
-    */
-
     /*
     const cells = [
       [1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -42,16 +29,40 @@ const App = React.createClass({
     ];
     */
 
+    /*
+    [9, 5, 3, 4, 2, 8, 7, 1, 6],
+    [2, 4, 1, 6, 7, 9, 8, 3, 5],
+    [7, 8, 6, 3, 5, 1, 9, 4, 2],
+    [8, 3, 5, 1, 9, 6, 4, 2, 7],
+    [1, 9, 4, 7, 3, 2, 5, 6, 8],
+    [6, 7, 2, 8, 4, 5, 3, 9, 1],
+    [3, 2, 8, 5, 1, 4, 6, 7, 9],
+    [4, 6, 9, 2, 8, 7, 1, 5, 3],
+    [5, 1, 7, 9, 6, 3, 2, 8, 4]
+    */
+
+    /*
+    [0, 0, 3, 0, 0, 8, 0, 0, 0],
+    [0, 4, 0, 0, 0, 0, 0, 0, 0],
+    [0, 8, 0, 3, 5, 0, 9, 0, 0],
+    [8, 0, 5, 0, 0, 6, 0, 0, 0],
+    [1, 0, 0, 7, 3, 2, 0, 0, 8],
+    [0, 0, 0, 8, 0, 0, 3, 0, 1],
+    [0, 0, 8, 0, 1, 4, 0, 7, 0],
+    [0, 0, 0, 0, 0, 0, 0, 5, 0],
+    [0, 0, 0, 9, 0, 0, 2, 0, 0]
+    */
+
     const cells = [
-      [5, 3, 0, 0, 7, 0, 0, 0, 0],
-      [6, 0, 0, 1, 9, 5, 0, 0, 0],
-      [0, 9, 8, 0, 0, 0, 0, 6, 0],
-      [8, 0, 0, 0, 6, 0, 0, 0, 3],
-      [4, 0, 0, 8, 0, 3, 0, 0, 1],
-      [7, 0, 0, 0, 2, 0, 0, 0, 6],
-      [0, 6, 0, 0, 0, 0, 2, 8, 0],
-      [0, 0, 0, 4, 1, 9, 0, 0, 5],
-      [0, 0, 0, 0, 8, 0, 0, 7, 9]
+      [9, 5, 3, 4, 2, 8, 7, 1, 6],
+      [2, 0, 0, 0, 0, 9, 8, 3, 5],
+      [7, 8, 6, 3, 5, 1, 9, 4, 2],
+      [8, 3, 5, 1, 9, 6, 4, 2, 7],
+      [1, 9, 4, 7, 3, 2, 5, 6, 8],
+      [6, 7, 2, 8, 4, 5, 3, 9, 1],
+      [3, 2, 8, 5, 1, 4, 6, 7, 9],
+      [4, 6, 9, 2, 8, 7, 1, 5, 3],
+      [5, 1, 7, 9, 6, 3, 2, 8, 4]
     ];
 
     const currentFocus = {
@@ -60,6 +71,11 @@ const App = React.createClass({
     };
 
     this.setState({ cells, currentFocus });
+  },
+  checkSolution() {
+    const solution = new Solver(this.state.cells).checkSolution();
+
+    console.log('Valid Solution:', solution);
   },
   setCurrentFocus(row = this.state.currentFocus.row, col = this.state.currentFocus.col, focus = false) {
     if(typeof row !== 'undefined' && typeof col !== 'undefined') {
@@ -115,6 +131,13 @@ const App = React.createClass({
         return false;
     }
   },
+  setValue(row, col, val) {
+    const cells = this.state.cells;
+
+    cells[row][col] = val;
+
+    this.setState({ cells });
+  },
   onKeyPress(e) {
     const { key } = e;
 
@@ -140,8 +163,9 @@ const App = React.createClass({
     return (
       <div onKeyDown={this.onKeyPress}>
         <h1>Simpledoku</h1>
-        <Game ref="game" rows={this.state.cells} buildRow={this.buildRow} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} keyBoardArrowConstants={this.keyBoardArrowConstants} currentFocus={this.state.currentFocus} />
+        <Game ref="game" rows={this.state.cells} buildRow={this.buildRow} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} keyBoardArrowConstants={this.keyBoardArrowConstants} currentFocus={this.state.currentFocus} setValue={this.setValue} />
         <button onClick={this.startGame}>Play</button>
+        <button onClick={this.checkSolution}>Solve</button>
       </div>
     );
   }
@@ -151,7 +175,7 @@ const Game = React.createClass({
   render() {
     const rows = this.props.rows.map((cells, row) => {
       return (
-        <Row key={`row-${row}`} ref={`row-${row}`} cols={cells} row={row} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} currentFocus={this.props.currentFocus} />
+        <Row key={`row-${row}`} ref={`row-${row}`} cols={cells} row={row} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} />
       );
     });
 
@@ -170,7 +194,7 @@ const Game = React.createClass({
 const Row = React.createClass({
   render() {
     const cells = this.props.cols.map((val, col) =>{
-      return <Cell key={`row-${this.props.row}-col-${col}`} ref={`row-${this.props.row}-col-${col}`} val={val} row={this.props.row} col={col} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} currentFocus={this.props.currentFocus} />
+      return <Cell key={`row-${this.props.row}-col-${col}`} ref={`row-${this.props.row}-col-${col}`} val={val} row={this.props.row} col={col} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} />
     });
 
     return (
@@ -195,6 +219,11 @@ const Cell = React.createClass({
       return true;
     }
   },
+  onChange(e) {
+    const { row, col } = this.props;
+
+    this.props.setValue(row, col, e.target.value);
+  },
   onFocus(e) {
     const { row, col } = this.props;
 
@@ -215,6 +244,7 @@ const Cell = React.createClass({
           tabIndex={(this.props.val !== 0) ? -1 : 0}
           onKeyDown={this.onKeyPress}
           onFocus={this.onFocus}
+          onChange={this.onChange}
         />
       </td>
     );
