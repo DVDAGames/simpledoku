@@ -1,4 +1,9 @@
-import { app, BrowserWindow } from 'electron';
+const electron = require('electron');
+
+const {
+  app,
+  BrowserWindow
+} = electron;
 
 var mainWindow = null;
 

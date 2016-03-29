@@ -53,6 +53,10 @@ td {
     border: none;
     margin: 0 auto;
     text-align: center;
+
+    &.simpledoku-cell-input--default {
+      font-weight: bold;
+    }
   }
 }
 

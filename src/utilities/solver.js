@@ -1,3 +1,4 @@
+'use strict';
 
 import _ from 'lodash';
 
@@ -35,7 +36,7 @@ export default class Solver {
       for(const prop in cells) {
         if(cells.hasOwnProperty(prop)) {
           if(cells[prop].length === 9) {
-            check = cells[prop].every(section, sectionIndex) => {
+            check = cells[prop].every((section, sectionIndex) => {
               return section.length === 9;
             });
           }

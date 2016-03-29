@@ -1,3 +1,5 @@
+'use strict';
+
 require('./app.scss');
 
 import React from 'react';
@@ -5,7 +7,10 @@ import ReactDOM from 'react-dom';
 
 import Solver from './utilities/solver';
 
-import { objectHasOwnValue } from './utilities/utils';
+import {
+  objectHasOwnValue,
+  cloneArray
+} from './utilities/utils';
 
 const App = React.createClass({
   keyBoardArrowConstants: {
@@ -13,6 +18,12 @@ const App = React.createClass({
     DOWN: 'ArrowDown',
     LEFT: 'ArrowLeft',
     RIGHT: 'ArrowRight'
+  },
+  keyBoardWASDConstants: {
+    UP: 87, //W
+    DOWN: 83, //S
+    LEFT: 65, //A
+    RIGHT: 68 //D
   },
   startGame() {
     /*
@@ -65,12 +76,14 @@ const App = React.createClass({
       [5, 1, 7, 9, 6, 3, 2, 8, 4]
     ];
 
+    const puzzle = cloneArray(cells);
+
     const currentFocus = {
       row: null,
       col: null
     };
 
-    this.setState({ cells, currentFocus });
+    this.setState({ cells, puzzle, currentFocus });
   },
   checkSolution() {
     const solution = new Solver(this.state.cells).checkSolution();
@@ -95,32 +108,32 @@ const App = React.createClass({
       }
     }
   },
-  moveFocus(row, col, direction) {
+  moveFocus(row, col, direction, constants) {
     const cells = this.state.cells;
 
     switch(direction) {
-      case this.keyBoardArrowConstants.UP:
+      case constants.UP:
         if(row > 0) {
           this.setCurrentFocus(row - 1, col, true);
         }
 
         break;
 
-      case this.keyBoardArrowConstants.DOWN:
+      case constants.DOWN:
         if(row < cells.length - 1) {
           this.setCurrentFocus(row + 1, col, true);
         }
 
         break;
 
-      case this.keyBoardArrowConstants.RIGHT:
+      case constants.RIGHT:
         if(col < cells[0].length - 1) {
           this.setCurrentFocus(row, col + 1, true);
         }
 
         break;
 
-      case this.keyBoardArrowConstants.LEFT:
+      case constants.LEFT:
         if(col > 0) {
           this.setCurrentFocus(row, col - 1, true);
         }
@@ -139,9 +152,15 @@ const App = React.createClass({
     this.setState({ cells });
   },
   onKeyPress(e) {
-    const { key } = e;
+    let { key } = e;
+    let constants = this.keyBoardArrowConstants;
 
-    if(objectHasOwnValue(this.keyBoardArrowConstants, key)) {
+    if(key === 'Unidentified') {
+      key = e.which;
+      constants = this.keyBoardWASDConstants;
+    }
+
+    if(objectHasOwnValue(constants, key)) {
       const { row, col } = this.state.currentFocus;
 
       if(row === null && col === null) {
@@ -156,6 +175,7 @@ const App = React.createClass({
   getInitialState() {
     return {
       cells: [],
+      puzzle: [],
       currentFocus: {}
     };
   },
@@ -163,7 +183,7 @@ const App = React.createClass({
     return (
       <div onKeyDown={this.onKeyPress}>
         <h1>Simpledoku</h1>
-        <Game ref="game" rows={this.state.cells} buildRow={this.buildRow} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} keyBoardArrowConstants={this.keyBoardArrowConstants} currentFocus={this.state.currentFocus} setValue={this.setValue} />
+        <Game ref="game" rows={this.state.cells} puzzle={this.state.puzzle} buildRow={this.buildRow} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} keyBoardArrowConstants={this.keyBoardArrowConstants} keyBoardWASDConstants={this.keyBoardWASDConstants} currentFocus={this.state.currentFocus} setValue={this.setValue} />
         <button onClick={this.startGame}>Play</button>
         <button onClick={this.checkSolution}>Solve</button>
       </div>
@@ -175,7 +195,7 @@ const Game = React.createClass({
   render() {
     const rows = this.props.rows.map((cells, row) => {
       return (
-        <Row key={`row-${row}`} ref={`row-${row}`} cols={cells} row={row} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} />
+        <Row key={`row-${row}`} ref={`row-${row}`} cols={cells} row={row} puzzle={this.props.puzzle} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} keyBoardWASDConstants={this.props.keyBoardWASDConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} />
       );
     });
 
@@ -194,7 +214,7 @@ const Game = React.createClass({
 const Row = React.createClass({
   render() {
     const cells = this.props.cols.map((val, col) =>{
-      return <Cell key={`row-${this.props.row}-col-${col}`} ref={`row-${this.props.row}-col-${col}`} val={val} row={this.props.row} col={col} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} />
+      return <Cell key={`row-${this.props.row}-col-${col}`} ref={`row-${this.props.row}-col-${col}`} val={val} puzzle={this.props.puzzle} row={this.props.row} col={col} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} keyBoardWASDConstants={this.props.keyBoardWASDConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} />
     });
 
     return (
@@ -207,14 +227,20 @@ const Row = React.createClass({
 
 const Cell = React.createClass({
   onKeyPress(e) {
-    const { key } = e;
+    let { key } = e;
+    let constants = this.props.keyBoardArrowConstants;
 
-    if(objectHasOwnValue(this.props.keyBoardArrowConstants, key)) {
+    if(key === 'Unidentified') {
+      key = e.which;
+      constants = this.props.keyBoardWASDConstants;
+    }
+
+    if(objectHasOwnValue(constants, key)) {
       e.preventDefault();
 
       const { row, col } = this.props;
 
-      this.props.moveFocus(row, col, key);
+      this.props.moveFocus(row, col, key, constants);
     } else {
       return true;
     }
@@ -238,9 +264,10 @@ const Cell = React.createClass({
           type="number"
           ref={`row-${this.props.row}-col-${this.props.col}-input`}
           defaultValue={(this.props.val === 0) ? null : this.props.val}
-          readOnly={(this.props.val === 0) ? false : true}
+          readOnly={(parseInt(this.props.puzzle[this.props.row][this.props.col], 10) === 0) ? false : true}
           min="1"
           max="9"
+          className={(parseInt(this.props.puzzle[this.props.row][this.props.col], 10) !== 0) ? 'simpledoku-cell-input simpledoku-cell-input--default' : 'simpledoku-cell-input'}
           tabIndex={(this.props.val !== 0) ? -1 : 0}
           onKeyDown={this.onKeyPress}
           onFocus={this.onFocus}

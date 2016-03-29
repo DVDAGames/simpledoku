@@ -1,3 +1,5 @@
+'use strict';
+
 var path = require('path');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -8,8 +10,10 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
+    publicPath: 'built',
     filename: '[name].js'
   },
+  watch: true,
   module: {
     loaders: [
       {
@@ -30,6 +34,8 @@ module.exports = {
   plugins: [
     new ExtractTextPlugin('app.css', {
       allChunks: true
-    })
+    }),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.IgnorePlugin(new RegExp("^(fs|ipc)$"))
   ]
 };
