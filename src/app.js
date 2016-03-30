@@ -132,8 +132,10 @@ const App = React.createClass({
     };
 
     const playing = true;
+    const puzzleSolved = false;
+    const puzzleChecked = false;
 
-    this.setState({ cells, puzzle, currentFocus, playing });
+    this.setState({ cells, puzzle, currentFocus, playing, puzzleSolved, puzzleChecked });
   },
   checkSolution() {
     const puzzleChecked = true;
