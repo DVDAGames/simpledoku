@@ -12,17 +12,11 @@ export default class Solver {
   }
 
   checkSolution() {
-    console.log('cells:', this.cells);
-
     const validLengths = this.checkArrayLengths();
 
     const noDuplicates = this.checkForDuplicates();
 
     const validValues = this.checkForValidValues();
-
-    console.log('validLengths:', validLengths);
-    console.log('noDuplicates:', noDuplicates);
-    console.log('validValues:', validValues);
 
     return (validLengths && noDuplicates && validValues);
   }
@@ -174,5 +168,21 @@ export default class Solver {
     });
 
     return columns;
+  }
+
+  generatePuzzle() {
+    let puzzle = [];
+
+    for(let i = 0; i < 9; i++) {
+      let row = [];
+
+      for(let j = 0; j < 9; j++) {
+        row.push(0);
+      }
+
+      puzzle.push(row);
+    }
+
+    return puzzle;
   }
 }
