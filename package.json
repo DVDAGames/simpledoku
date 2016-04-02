@@ -5,13 +5,15 @@
   "main": "dist/window.js",
   "scripts": {
     "clean": "cleandir ./dist/",
-    "webpack": "webpack-dev-server --content-base src/",
+    "webpack": "webpack",
     "copy:window": "cp ./src/window.js ./dist/window.js",
     "copy:html": "cp ./src/index.html ./dist/index.html",
+    "copy:server": "cp ./src/server.js ./dist/server.js",
     "electron": "electron .",
     "electron:rebuild": "electron-rebuild .",
+    "server": "node ./dist/server.js",
     "watch": "npm run webpack",
-    "start": "npm run copy:window && npm run copy:html && npm run electron",
+    "start": "npm run copy:window & npm run copy:html && npm run electron",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -35,6 +37,8 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "hapi": "^13.2.2",
+    "inert": "^3.2.0",
     "lodash": "^4.6.1",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",

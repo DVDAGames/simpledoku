@@ -2,8 +2,12 @@
 
 import _ from 'lodash';
 
+import Puzzle from './puzzle';
+
 export default class Solver {
   constructor(cells = []) {
+    this.puzzler = new Puzzle(true);
+
     this.cells = {
       grids: this.createGridArrays(cells),
       columns: this.createColumnArrays(cells),
@@ -84,7 +88,9 @@ export default class Solver {
       for(const prop in cells) {
         if(cells.hasOwnProperty(prop)) {
           check = cells[prop].every((section, sectionIndex) => {
-            return _.uniq(section).length === 9;
+            const test = _.uniq(section).length === this.puzzler.puzzleRowLength;
+
+            return test;
           });
 
           if(!check) {
@@ -98,17 +104,7 @@ export default class Solver {
   }
 
   createGridArrays(rows) {
-    const grids = [
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      []
-    ];
+    const grids = this.puzzler.generatePuzzle();
 
     rows.map((row, rowIndex) => {
       let gridRow;
@@ -149,17 +145,7 @@ export default class Solver {
   }
 
   createColumnArrays(rows) {
-    const columns = [
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      []
-    ];
+    const columns = this.puzzler.generatePuzzle();
 
     rows.map((row, rowIndex) => {
       row.map((cell, colIndex) => {
@@ -168,21 +154,5 @@ export default class Solver {
     });
 
     return columns;
-  }
-
-  generatePuzzle() {
-    let puzzle = [];
-
-    for(let i = 0; i < 9; i++) {
-      let row = [];
-
-      for(let j = 0; j < 9; j++) {
-        row.push(0);
-      }
-
-      puzzle.push(row);
-    }
-
-    return puzzle;
   }
 }

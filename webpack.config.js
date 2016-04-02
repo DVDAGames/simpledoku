@@ -7,10 +7,11 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   entry: {
     app: './src/app.js'
+    //server: './src/server.js'
   },
   output: {
-    path: path.join(__dirname, 'dist'),
-    publicPath: 'built',
+    path: path.join(__dirname, 'dist/assets'),
+    //publicPath: 'built',
     filename: '[name].js'
   },
   watch: true,
@@ -35,7 +36,7 @@ module.exports = {
     new ExtractTextPlugin('app.css', {
       allChunks: true
     }),
-    new webpack.HotModuleReplacementPlugin(),
+    //new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin(new RegExp("^(fs|ipc)$"))
   ]
 };
