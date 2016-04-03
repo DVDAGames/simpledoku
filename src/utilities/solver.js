@@ -1,6 +1,6 @@
 'use strict';
 
-import _ from 'lodash';
+import { flatten, random, shuffle, uniq, without, countBy, identity, map, sortBy } from 'lodash';
 
 import Puzzle from './puzzle';
 
@@ -8,21 +8,9 @@ import { cloneArray } from './utils';
 
 export default class Solver {
   constructor(cells = []) {
-    this.puzzler = new Puzzle(true);
+    this.puzzler = new Puzzle(true, false);
 
     this.lastSolution = [];
-
-    this.matrix = [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ];
 
     this.cells = {
       grids: this.createGridArrays(cells),
@@ -44,41 +32,23 @@ export default class Solver {
   chooseNextCell(puzzle) {
     let row, col;
 
-    puzzle.forEach((rowValues, rowIndex, rowArray) => {
-      rowValues.forEach((colValue, colIndex, colArray) => {
+    puzzle.some((rowValues, rowIndex, rowArray) => {
+      let test = rowValues.some((colValue, colIndex, colArray) => {
         if(colValue === 0) {
           row = rowIndex;
           col = colIndex;
+
+          return true;
         }
       });
+
+      return test
     });
 
     return {
       row,
       col
     };
-  }
-
-  chooseRandomCell(puzzle) {
-    let row;
-    let col;
-
-    row = _.random(this.puzzler.puzzleMinValue - 1, this.puzzler.puzzleMaxValue - 1);
-
-    while(puzzle[row].indexOf(0) === -1) {
-      row = _.random(this.puzzler.puzzleMinValue - 1, this.puzzler.puzzleMaxValue - 1);
-    }
-
-    col = _.random(this.puzzler.puzzleMinValue - 1, this.puzzler.puzzleMaxValue - 1);
-
-    while(puzzle[row][col] !== 0) {
-      col = _.random(this.puzzler.puzzleMinValue - 1, this.puzzler.puzzleMaxValue - 1);
-    }
-
-    return {
-      row,
-      col
-    }
   }
 
   chooseRandomValueForCell(cell, puzzle, solutionHelper, invalidValues) {
@@ -93,12 +63,10 @@ export default class Solver {
       if(helperCell.length === 1) {
         value = helperCell[0];
       } else {
-        value = helperCell[_.random(0, helperCell.length - 1)];
-      }
+        const validValues = without(helperCell, invalidCell);
 
-      if(invalidCell.length && invalidCell.indexOf(value) !== -1) {
-        while(invalidCell.indexOf(value) !== -1 || valueChecks < maxValueChecks) {
-          value = helperCell[_.random(0, helperCell.length - 1)];
+        if(validValues.length) {
+          value = validValues[random(0, validValues.length - 1)];
         }
       }
 
@@ -108,7 +76,8 @@ export default class Solver {
         this.lastSolution.push({
           row: cell.row,
           col: cell.col,
-          val: value
+          val: value,
+          helper: solutionHelper
         });
 
         solutionHelper.forEach((row, rowIndex, rowArray) => {
@@ -149,18 +118,20 @@ export default class Solver {
           });
         });
       } else {
-        const lastIndex = this.lastSolution.length - 1;
+        const { row, col, val, helper } = this.lastSolution.pop();
 
-        const { row, col, val } = this.lastSolution[lastIndex];
+        solutionHelper = helper;
 
         invalidValues[row][col].push(val);
       }
     } else {
-      const lastIndex = this.lastSolution.length - 1;
+      if(this.lastSolution.length) {
+        const { row, col, val, helper } = this.lastSolution.pop();
 
-      const { row, col, val } = this.lastSolution[lastIndex];
+        solutionHelper = helper;
 
-      invalidValues[row][col].push(val);
+        invalidValues[row][col].push(val);
+      }
     }
 
     return {
@@ -174,10 +145,10 @@ export default class Solver {
   createSolution() {
     const puzzleBuilder = new Puzzle(false, true);
 
-    const { puzzle, invalidValues, matrix, solutionHelper} = puzzleBuilder.generatePuzzleMatrices();
+    const { puzzle, invalidValues, solutionHelper} = puzzleBuilder.generatePuzzleMatrices();
 
     let fullPuzzle = this.solvePuzzleTrampoline(() => {
-      const test = this.solvePuzzle(puzzle, solutionHelper, invalidValues, matrix);
+      const test = this.solvePuzzle(puzzle, solutionHelper, invalidValues);
 
       return test;
     });
@@ -193,109 +164,46 @@ export default class Solver {
     return fn;
   }
 
-  solvePuzzle(puzzle, solutionHelper, invalidValues, matrix, passes = 0) {
-    console.log('pass #', passes);
-    passes++;
+  stillHasZeros(puzzle) {
+    const check = puzzle.some((row) => {
+      const test = row.some((cell) => {
+        if(cell === 0) {
+          return true;
+        }
+      });
 
-    if(passes < 200) {
+      return test;
+    });
+
+    return check;
+  }
+
+  solvePuzzle(puzzle, solutionHelper, invalidValues, passes = 0) {
+    if(this.stillHasZeros(puzzle)) {
       passes++;
 
-      const cell = this.chooseNextCell(puzzle);
+      if(passes < 200000) {
+        const cell = this.chooseNextCell(puzzle);
 
-      if(typeof cell.row !== 'undefined' && typeof cell.col !== 'undefined') {
-        const calculate = this.chooseRandomValueForCell(cell, puzzle, solutionHelper, invalidValues);
+        if(typeof cell.row !== 'undefined' && typeof cell.col !== 'undefined') {
+          const calculate = this.chooseRandomValueForCell(cell, puzzle, solutionHelper, invalidValues);
 
-        if(calculate.safe) {
-          puzzle[cell.row][cell.col] = calculate.value;
+          if(calculate.safe) {
+            //matrices = this.mapCellToConstraintMatrices(cell, calculate.value, matrices);
+
+            puzzle[cell.row][cell.col] = calculate.value;
+          }
 
           solutionHelper = calculate.solutionHelper;
-        } else {
-          const backtrack = this.revertLastSolutionValue(calculate.solutionHelper);
 
-          solutionHelper = backtrack.solutionHelper;
+          return this.solvePuzzle(puzzle, solutionHelper, invalidValues, passes);
         }
-
-        return this.solvePuzzle(puzzle, solutionHelper, calculate.invalidValues, matrix, passes);
       } else {
-        const backtrack = this.revertLastSolutionValue(solutionHelper);
-
-        solutionHelper = backtrack.solutionHelper;
-
-        return this.solvePuzzle(puzzle, solutionHelper, invalidValues, matrix, passes);
+        return this.createSolution();
       }
     }
 
     return puzzle;
-  }
-
-  revertLastSolutionValue(solutionHelper) {
-    const lastIndex = this.lastSolution.length - 1;
-
-    const cell = this.lastSolution.pop();
-
-    console.log(cell);
-
-    solutionHelper.forEach((row, rowIndex, rowArray) => {
-      row.forEach((column, columnIndex, columnArray) => {
-        if(rowIndex === cell.row) {
-          solutionHelper[rowIndex][columnIndex].push(cell.val);
-        } else if(columnIndex === cell.col) {
-          solutionHelper[rowIndex][columnIndex].push(cell.val);
-        } else {
-          if(cell.row > -1 && cell.row < 3 && rowIndex > -1 && rowIndex < 3) {
-            if(cell.col > -1 && cell.col < 3 && columnIndex > -1 && columnIndex < 3) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            } else if(cell.col > 2 && cell.col < 6 && columnIndex > 2 && columnIndex < 6) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            } else if(cell.col > 5 && cell.col < 9 && columnIndex > 5 && columnIndex < 9) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            }
-          } else if(cell.row > 2 && cell.row < 6 && rowIndex > 2 && rowIndex < 6) {
-            if(cell.col > -1 && cell.col < 3 && columnIndex > -1 && columnIndex < 3) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            } else if(cell.col > 2 && cell.col < 6 && columnIndex > 2 && columnIndex < 6) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            } else if(cell.col > 5 && cell.col < 9 && columnIndex > 5 && columnIndex < 9) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            }
-          } else if(cell.row > 5 && cell.row < 9 && rowIndex > 5 && rowIndex < 9) {
-            if(cell.col > -1 && cell.col < 3 && columnIndex > -1 && columnIndex < 3) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            } else if(cell.col > 2 && cell.col < 6 && columnIndex > 2 && columnIndex < 6) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            } else if(cell.col > 5 && cell.col < 9 && columnIndex > 5 && columnIndex < 9) {
-              solutionHelper[rowIndex][columnIndex].push(cell.val);
-            }
-          }
-        }
-      });
-    });
-
-    return {
-      solutionHelper
-    };
-  }
-
-  createSolutionArray() {
-    let solutionArray = [];
-
-    for(let i = 0; i < this.puzzler.puzzleRowLength; i++) {
-      solutionArray[i] = [];
-
-      for(let j = 0; j < this.puzzler.puzzleRowLength; j++) {
-        solutionArray[i][j] = [];
-
-        for(let k = 0; k < this.puzzler.puzzleMaxValue; k++) {
-          const val = k + 1;
-
-          solutionArray[i][j].push(val);
-        }
-
-        solutionArray[i][j] = _.shuffle(solutionArray[i][j]);
-      }
-    }
-
-    return solutionArray;
   }
 
   checkArrayLengths() {
@@ -358,10 +266,12 @@ export default class Solver {
     let check;
 
     if(cells) {
+
+      console.log(cells);
       for(const prop in cells) {
         if(cells.hasOwnProperty(prop)) {
           check = cells[prop].every((section, sectionIndex) => {
-            const test = _.uniq(section).length === this.puzzler.puzzleRowLength;
+            const test = uniq(section).length === this.puzzler.puzzleRowLength;
 
             return test;
           });
@@ -377,7 +287,7 @@ export default class Solver {
   }
 
   createGridArrays(rows) {
-    const grids = this.puzzler.generatePuzzle();
+    const grids = this.puzzler.generateMatrix();
 
     rows.map((row, rowIndex) => {
       let gridRow;
@@ -387,7 +297,7 @@ export default class Solver {
         gridRow = 0;
       } else if(rowIndex < 6) {
         gridRow = 1;
-      } else {
+      } else if(rowIndex < 9) {
         gridRow = 2;
       }
 
@@ -396,12 +306,22 @@ export default class Solver {
           gridColumn = 0;
         } else if(colIndex < 6) {
           gridColumn = 1;
-        } else {
+        } else if(colIndex < 9) {
           gridColumn = 2;
         }
 
-        grids[this.mapToGrid(gridRow, gridColumn)].push(cellValue);
-      })
+        const gridIndex = this.mapToGrid(gridRow, gridColumn);
+
+        if(!Array.isArray(grids[gridIndex])) {
+          grids[gridIndex] = [];
+        }
+
+        const nextItem = grids[gridIndex].indexOf(undefined);
+
+        if(nextItem !== -1) {
+          grids[gridIndex][nextItem] = cellValue;
+        }
+      });
     });
 
     return grids;
@@ -411,18 +331,22 @@ export default class Solver {
     if(row === 0) {
       return column;
     } else if(row === 1) {
-      return row * 4 - 1 + column;
+      return 3 + column;
     } else if(row === 2) {
-      return row * 3 + column;
+      return 6 + column;
     }
   }
 
   createColumnArrays(rows) {
-    const columns = this.puzzler.generatePuzzle();
+    const columns = this.puzzler.generateMatrix();
 
     rows.map((row, rowIndex) => {
       row.map((cell, colIndex) => {
-        columns[colIndex].push(cell);
+        const nextItem = columns[colIndex].indexOf(undefined);
+
+        if(nextItem !== -1) {
+          columns[colIndex][nextItem] = cell;
+        }
       });
     });
 

@@ -16,6 +16,17 @@ import {
 } from 'react-router';
 
 import Game from './components/Game/Game';
+import Generator from './components/Generator/Generator';
+
+class App extends Component {
+  render() {
+    return (
+      <section className="simpledoku-app-container">
+        <h1>Simpledoku</h1>
+      </section>
+    );
+  }
+}
 
 class Help extends Component {
   constructor() {
@@ -38,8 +49,9 @@ class Help extends Component {
 
 render((
   <Router history={browserHistory}>
-    <Route path="/game" component={Game}>
-      <Route path="help" component={Help} />
-    </Route>
+    <Route path="/" component={App} />
+    <Route path="/game" component={Game} />
+    <Route path="/game/help" component={Help} />
+    <Route path="/game/generator" component={Generator} />
   </Router>
 ), document.getElementById('main'));

@@ -44,7 +44,7 @@ body {
         width: 120px;
         height: 120px;
         border: 2px solid rgba(0, 220, 30, 0.75);
-        transform: translateX(-52%) translateY(-35%);
+        transform: translateX(-50%) translateY(-50%);
         background: rgba(225, 240, 225, 0.75);
       }
 
@@ -54,7 +54,7 @@ body {
         border-left: 6px solid rgba(0, 220, 30, 0.75);
         border-bottom: 6px solid rgba(0, 220, 30, 0.75);
         transform-origin: 80% 60%;
-        transform: translateX(-50%) translateY(-50%) rotate(-45deg);
+        transform: translateX(-50%) translateY(-100%) rotate(-45deg);
       }
     }
 
@@ -63,7 +63,7 @@ body {
         width: 120px;
         height: 120px;
         border: 2px solid rgba(220, 30, 0, 0.75);
-        transform: translateX(-52%) translateY(-35%);
+        transform: translateX(-50%) translateY(-50%);
         background: rgba(240, 225, 225, 0.75);
       }
 
@@ -74,7 +74,7 @@ body {
         font-size: 60px;
         line-height: 1.0;
         color: rgba(220, 30, 0, 0.75);
-        transform: translateX(-50%) translateY(-25%);
+        transform: translateX(-50%) translateY(-50%);
       }
     }
 

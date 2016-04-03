@@ -26,6 +26,18 @@ const defaultFirstRow = [
   9
 ];
 
+const defaultMatrixRow = [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+];
+
 export default class Puzzle {
   constructor(leaveNull = false, generateFirstRow = false) {
     this.leaveNull = leaveNull;
@@ -42,6 +54,10 @@ export default class Puzzle {
 
   get defaultFirstRow() {
     return defaultFirstRow;
+  }
+
+  get defaultMatrixRow() {
+    return defaultMatrixRow;
   }
 
   get puzzleMaxValue() {
@@ -136,15 +152,29 @@ export default class Puzzle {
     return this.setDefaultHelpers(helper, puzzle[0]);
   }
 
+  generateConstraintMatrix(matrixValues, puzzle) {
+    let matrix = this.generateMatrix(matrixValues);
+
+    puzzle.forEach((row, rowIndex, rowArray) => {
+      row.forEach((col, colIndex, colArray) => {
+        if(col !== 0) {
+          matrix[rowIndex][colIndex][col -1] = 1;
+        }
+      });
+    });
+
+    return matrix;
+  }
+
   generatePuzzleMatrices() {
-    const matrix = this.generateMatrix(this.puzzleEmptyValue);
     const invalidValues = this.generateMatrix([]);
-    const puzzle = this.generatePuzzle(matrix);
+    const puzzle = this.generatePuzzle(this.generateMatrix(this.puzzleEmptyValue));
     const solutionHelper = this.generateSolutionHelper(puzzle);
+    //const matrix = this.generateConstraintMatrix(this.defaultMatrixRow, puzzle);
 
     return {
       puzzle,
-      matrix,
+      //matrix,
       invalidValues,
       solutionHelper
     };

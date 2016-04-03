@@ -4,6 +4,8 @@ const electron = require('electron');
 const Hapi = require('hapi');
 const Path = require('path');
 
+const PuzzleService= require('./services/puzzle');
+
 const {
   app,
   BrowserWindow
@@ -50,6 +52,22 @@ app.on('will-finish-launching', () => {
         reply.file('index.html');
       }
     });
+
+    server.route({
+      method: 'GET',
+      path: '/puzzle',
+      handler(request, reply) {
+        reply(PuzzleService.getPuzzle());
+      }
+    });
+
+    server.route({
+      method: 'GET',
+      path: '/game/generator',
+      handler(request, reply) {
+        reply.file('index.html');
+      }
+    })
 
     server.route({
       method: 'GET',

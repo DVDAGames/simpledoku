@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import _ from 'lodash';
-import axios from 'axios';
 
 import Grid from '../Grid/Grid';
 import GameButton from '../Game-Button/Game-Button';
@@ -17,6 +16,8 @@ import {
 class Game extends Component {
   constructor(props) {
     super(props);
+
+    console.log("GENERATOR");
 
     this.state = {
       cells: [],
@@ -69,32 +70,10 @@ class Game extends Component {
         }
       },
       {
-        key: 'resetBtn',
-        type: 'reset',
-        action: 'resetPuzzle',
-        buttonText: 'Reset Puzzle',
-        visibleStates: {
-          default: false,
-          playing: true,
-          puzzleSolved: false
-        }
-      },
-      {
         key: 'solveBtn',
         type: 'submit',
         action: 'onSubmit',
         buttonText: 'Check Solution',
-        visibleStates: {
-          default: false,
-          playing: true,
-          puzzleSolved: false
-        }
-      },
-      {
-        key: 'hintBtn',
-        type: 'button',
-        action: 'getHint',
-        buttonText: 'Get Hint',
         visibleStates: {
           default: false,
           playing: true,
@@ -113,8 +92,6 @@ class Game extends Component {
     this.startGame = this.startGame.bind(this);
     this.checkSolution = this.checkSolution.bind(this);
     this.puzzleCheckedState = this.puzzleCheckedState.bind(this);
-    this.resetPuzzle = this.resetPuzzle.bind(this);
-    this.getHint = this.getHint.bind(this);
     this.setCurrentFocus = this.setCurrentFocus.bind(this);
     this.moveFocus = this.moveFocus.bind(this);
     this.setValue = this.setValue.bind(this);
@@ -125,29 +102,22 @@ class Game extends Component {
   }
 
   startGame() {
-    const puzzle = axios.get('http://localhost:3333/puzzle')
-      .then((response) => {
-        const cells = response.data.puzzle;
+    const generator = new Solver();
 
-        const generator = new Solver(cells);
+    const cells = generator.createSolution();
 
-        const puzzle = cloneArray(cells);
+    const puzzle = cloneArray(cells);
 
-        const currentFocus = {
-          row: null,
-          col: null
-        };
+    const currentFocus = {
+      row: null,
+      col: null
+    };
 
-        const playing = true;
-        const puzzleSolved = false;
-        const puzzleChecked = false;
+    const playing = true;
+    const puzzleSolved = false;
+    const puzzleChecked = false;
 
-        this.setState({ cells, puzzle, currentFocus, playing, puzzleSolved, puzzleChecked });
-      })
-      .catch((response) => {
-        console.log('Error Starting Game');
-      })
-    ;
+    this.setState({ cells, puzzle, currentFocus, playing, puzzleSolved, puzzleChecked });
   }
 
   onSubmit(e) {
@@ -172,22 +142,6 @@ class Game extends Component {
 
   puzzleCheckedState(puzzleChecked) {
     this.setState({ puzzleChecked });
-  }
-
-  resetPuzzle() {
-    const cells = cloneArray(this.state.puzzle);
-
-    const puzzleChecked = false;
-
-    this.setState({ cells, puzzleChecked });
-
-    this.resetFocus();
-  }
-
-  getHint() {
-    console.log('Give user hint');
-
-    this.resetFocus();
   }
 
   switchHighlightMode(row, col, currentMode = this.state.highlightMode) {
@@ -290,8 +244,6 @@ class Game extends Component {
       constants = this.keyBoardWASDConstants;
     }
 
-    console.log(key);
-
     if(objectHasOwnValue(constants, key)) {
       const { row, col } = this.state.currentFocus;
 
@@ -344,7 +296,7 @@ class Game extends Component {
       <div className="simpledoku-game"  onKeyDown={this.onKeyPress}>
         <h1>Simpledoku</h1>
         <form autoComplete="off" noValidate onSubmit={this.onSubmit}>
-          <Grid ref="game" { ...this.state } startGame={this.startGame} onKeyPress={this.onKeyPress} setValue={this.setValue} resetFocus={this.resetFocus} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} switchHighlightMode={this.switchHighlightMode} getHint={this.getHint} resetPuzzle={this.resetPuzzle} puzzleCheckedState={this.puzzleCheckedState} checkSolution={this.checkSolution} highlightModes={this.highlightModes} keyBoardWASDConstants={this.keyBoardWASDConstants} keyBoardArrowConstants={this.keyBoardArrowConstants} keyBoardOtherConstants={this.keyBoardOtherConstants} inputValues={this.inputValues} />
+          <Grid ref="game" { ...this.state } startGame={this.startGame} onKeyPress={this.onKeyPress} setValue={this.setValue} resetFocus={this.resetFocus} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} switchHighlightMode={this.switchHighlightMode} puzzleCheckedState={this.puzzleCheckedState} checkSolution={this.checkSolution} highlightModes={this.highlightModes} keyBoardWASDConstants={this.keyBoardWASDConstants} keyBoardArrowConstants={this.keyBoardArrowConstants} keyBoardOtherConstants={this.keyBoardOtherConstants} inputValues={this.inputValues} />
 
           { buttons }
 
