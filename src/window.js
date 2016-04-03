@@ -101,7 +101,7 @@ app.on('ready', () => {
     height: 600
   });
 
-  mainWindow.loadURL('http://localhost:3333/game');
+  mainWindow.loadURL('http://localhost:3333/');
 
   mainWindow.webContents.openDevTools();
 
