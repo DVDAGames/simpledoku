@@ -17,16 +17,15 @@ class Game extends Component {
   constructor(props) {
     super(props);
 
-    this.startGame = this.startGame.bind(this);
-    this.checkSolution = this.checkSolution.bind(this);
-    this.puzzleCheckedState = this.puzzleCheckedState.bind(this);
-    this.resetPuzzle = this.resetPuzzle.bind(this);
-    this.getHint = this.getHint.bind(this);
-    this.setCurrentFocus = this.setCurrentFocus.bind(this);
-    this.moveFocus = this.moveFocus.bind(this);
-    this.setValue = this.setValue.bind(this);
-    this.onKeyPress = this.onKeyPress.bind(this);
-    this.resetFocus = this.resetFocus.bind(this);
+    this.state = {
+      cells: [],
+      puzzle: [],
+      currentFocus: {},
+      puzzleSolved: false,
+      playing: false,
+      puzzleChecked: false,
+      highlightMode: 0
+    };
 
     this.keyBoardArrowConstants = {
       UP: 'ArrowUp',
@@ -42,9 +41,20 @@ class Game extends Component {
       RIGHT: 68 //D
     };
 
+    this.keyBoardOtherConstants = {
+      SOLVE: ['Enter'],
+      VALID_VALUE: [49, 50, 51, 52, 53, 54, 55, 56, 57]
+    };
+
+    this.inputValues = {
+      min: 1,
+      max: 9
+    };
+
     this.buttonArray = [
       {
         key: 'playBtn',
+        type: 'button',
         action: 'startGame',
         buttonText: {
           default: 'Play',
@@ -59,6 +69,7 @@ class Game extends Component {
       },
       {
         key: 'resetBtn',
+        type: 'reset',
         action: 'resetPuzzle',
         buttonText: 'Reset Puzzle',
         visibleStates: {
@@ -69,7 +80,8 @@ class Game extends Component {
       },
       {
         key: 'solveBtn',
-        action: 'checkSolution',
+        type: 'submit',
+        action: 'onSubmit',
         buttonText: 'Check Solution',
         visibleStates: {
           default: false,
@@ -79,6 +91,7 @@ class Game extends Component {
       },
       {
         key: 'hintBtn',
+        type: 'button',
         action: 'getHint',
         buttonText: 'Get Hint',
         visibleStates: {
@@ -89,14 +102,25 @@ class Game extends Component {
       }
     ];
 
-    this.state = {
-      cells: [],
-      puzzle: [],
-      currentFocus: {},
-      puzzleSolved: false,
-      playing: false,
-      puzzleChecked: false
-    };
+    this.highlightModes = [
+      'none',
+      'row',
+      'col',
+      'section'
+    ];
+
+    this.startGame = this.startGame.bind(this);
+    this.checkSolution = this.checkSolution.bind(this);
+    this.puzzleCheckedState = this.puzzleCheckedState.bind(this);
+    this.resetPuzzle = this.resetPuzzle.bind(this);
+    this.getHint = this.getHint.bind(this);
+    this.setCurrentFocus = this.setCurrentFocus.bind(this);
+    this.moveFocus = this.moveFocus.bind(this);
+    this.setValue = this.setValue.bind(this);
+    this.onKeyPress = this.onKeyPress.bind(this);
+    this.resetFocus = this.resetFocus.bind(this);
+    this.switchHighlightMode = this.switchHighlightMode.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
   }
 
   startGame() {
@@ -138,7 +162,11 @@ class Game extends Component {
     [0, 0, 0, 9, 0, 0, 2, 0, 0]
     */
 
-    const cells = [
+    const generator = new Solver();
+
+    const cells = generator.createSolution();
+
+    /*const cells = [
       [9, 5, 3, 4, 2, 8, 7, 1, 6],
       [2, 0, 1, 6, 7, 9, 8, 3, 5],
       [7, 8, 6, 3, 5, 1, 9, 4, 2],
@@ -148,7 +176,7 @@ class Game extends Component {
       [3, 2, 8, 5, 1, 4, 6, 7, 9],
       [4, 6, 9, 2, 8, 7, 1, 5, 3],
       [5, 1, 7, 9, 6, 3, 2, 8, 4]
-    ];
+    ];*/
 
     const puzzle = cloneArray(cells);
 
@@ -162,6 +190,12 @@ class Game extends Component {
     const puzzleChecked = false;
 
     this.setState({ cells, puzzle, currentFocus, playing, puzzleSolved, puzzleChecked });
+  }
+
+  onSubmit(e) {
+    e.preventDefault();
+
+    this.checkSolution();
   }
 
   checkSolution() {
@@ -198,6 +232,19 @@ class Game extends Component {
     this.resetFocus();
   }
 
+  switchHighlightMode(row, col, currentMode = this.state.highlightMode) {
+    let highlightMode;
+    let highlights;
+
+    if(currentMode + 1 < this.highlightModes.length) {
+      highlightMode = currentMode + 1;
+    } else {
+      highlightMode = 0;
+    }
+
+    this.setState({ highlightMode });
+  }
+
   setCurrentFocus(row = this.state.currentFocus.row, col = this.state.currentFocus.col, focus = false) {
     if(typeof row !== 'undefined' && typeof col !== 'undefined') {
       if(this.state.currentFocus.row !== row || this.state.currentFocus.col !== col) {
@@ -227,28 +274,24 @@ class Game extends Component {
         }
 
         break;
-
       case constants.DOWN:
         if(row < cells.length - 1) {
           this.setCurrentFocus(row + 1, col, true);
         }
 
         break;
-
       case constants.RIGHT:
         if(col < cells[0].length - 1) {
           this.setCurrentFocus(row, col + 1, true);
         }
 
         break;
-
       case constants.LEFT:
         if(col > 0) {
           this.setCurrentFocus(row, col - 1, true);
         }
 
         break;
-
       default:
         return false;
     }
@@ -289,6 +332,8 @@ class Game extends Component {
       constants = this.keyBoardWASDConstants;
     }
 
+    console.log(key);
+
     if(objectHasOwnValue(constants, key)) {
       const { row, col } = this.state.currentFocus;
 
@@ -304,7 +349,7 @@ class Game extends Component {
 
   render() {
     const buttons = this.buttonArray.map((button) => {
-      let { key, action, buttonText, visibleStates } = button;
+      let { key, action, buttonText, visibleStates, type } = button;
 
       const visibleStatesArray = _.keys(visibleStates);
 
@@ -333,17 +378,19 @@ class Game extends Component {
       }
 
       if(displayButton) {
-        return <GameButton key={key} ref={key} action={this[action]} buttonText={buttonText} />
+        return <GameButton key={key} ref={key} action={this[action]} buttonText={buttonText} type={type} />
       }
     });
 
     return (
       <div className="simpledoku-game"  onKeyDown={this.onKeyPress}>
         <h1>Simpledoku</h1>
-        <Grid ref="game" rows={this.state.cells} puzzle={this.state.puzzle} buildRow={this.buildRow} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} keyBoardArrowConstants={this.keyBoardArrowConstants} keyBoardWASDConstants={this.keyBoardWASDConstants} currentFocus={this.state.currentFocus} setValue={this.setValue} puzzleSolved={this.state.puzzleSolved} puzzleChecked={this.state.puzzleChecked} puzzleCheckedState={this.puzzleCheckedState}/>
+        <form autoComplete="off" noValidate onSubmit={this.onSubmit}>
+          <Grid ref="game" { ...this.state } startGame={this.startGame} onKeyPress={this.onKeyPress} setValue={this.setValue} resetFocus={this.resetFocus} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} switchHighlightMode={this.switchHighlightMode} getHint={this.getHint} resetPuzzle={this.resetPuzzle} puzzleCheckedState={this.puzzleCheckedState} checkSolution={this.checkSolution} highlightModes={this.highlightModes} keyBoardWASDConstants={this.keyBoardWASDConstants} keyBoardArrowConstants={this.keyBoardArrowConstants} keyBoardOtherConstants={this.keyBoardOtherConstants} inputValues={this.inputValues} />
 
-        { buttons }
+          { buttons }
 
+        </form>
       </div>
     );
   }

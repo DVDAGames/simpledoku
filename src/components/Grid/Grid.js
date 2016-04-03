@@ -6,15 +6,15 @@ import Row from '../Row/Row';
 
 class Grid extends Component {
   constructor(props) {
-    super();
+    super(props);
 
     this.props = props;
   }
 
   render() {
-    const rows = this.props.rows.map((cells, row) => {
+    const rows = this.props.cells.map((cells, row) => {
       return (
-        <Row key={`row-${row}`} ref={`row-${row}`} cols={cells} row={row} puzzle={this.props.puzzle} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} keyBoardWASDConstants={this.props.keyBoardWASDConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} puzzleCheckedState={this.props.puzzleCheckedState} />
+        <Row key={`row-${row}`} ref={`row-${row}`} cols={cells} row={row} { ...this.props } />
       );
     });
 

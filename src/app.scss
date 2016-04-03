@@ -23,6 +23,7 @@ body {
   }
 
   &-grid {
+    position: relative;
     width: 90%;
     margin: 0 auto;
 
@@ -34,6 +35,7 @@ body {
         position: absolute;
         top: 50%;
         left: 50%;
+        z-index: 10;
       }
     }
 
@@ -101,25 +103,46 @@ body {
     background: #fff;
     text-align: center;
 
+    &--highlight {
+      > [type=number] {
+        background: rgba(63, 184, 191, 0.2);
+
+        &:not([readonly]):focus {
+          background: #fff;
+        }
+      }
+    }
+
     &:nth-child(3),
     &:nth-child(6) {
       border-right: 2px solid #666;
     }
 
     &-input {
+      position: relative;
       width: 100%;
       height: 100%;
       padding: 10px 0;
       border: none;
       margin: 0 auto;
       text-align: center;
+      z-index: 1;
+
+      -webkit-appearance: none;
 
       &.simpledoku-cell-input--default {
         font-weight: bold;
       }
 
+      &:focus {
+        border: none;
+        outline: 5px solid #999;
+        z-index: 2;
+      }
+
       &[readonly]:focus {
         background: #e7e7e7;
+        outline: none;
       }
 
       &::-webkit-inner-spin-button,

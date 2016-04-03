@@ -13,7 +13,7 @@ class Row extends Component {
 
   render() {
     const cells = this.props.cols.map((val, col) =>{
-      return <Cell key={`row-${this.props.row}-col-${col}`} ref={`row-${this.props.row}-col-${col}`} val={val} puzzle={this.props.puzzle} row={this.props.row} col={col} moveFocus={this.props.moveFocus} setCurrentFocus={this.props.setCurrentFocus} keyBoardArrowConstants={this.props.keyBoardArrowConstants} keyBoardWASDConstants={this.props.keyBoardWASDConstants} currentFocus={this.props.currentFocus} setValue={this.props.setValue} puzzleCheckedState={this.props.puzzleCheckedState} />
+      return <Cell key={`row-${this.props.row}-col-${col}`} ref={`row-${this.props.row}-col-${col}`} col={col} val={val} { ...this.props} />
     });
 
     return (
