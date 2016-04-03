@@ -41,7 +41,7 @@ app.on('will-finish-launching', () => {
       method: 'GET',
       path: '/',
       handler(request, reply) {
-        reply('Testing Hapi Server');
+        reply.file('index.html');
       }
     });
 

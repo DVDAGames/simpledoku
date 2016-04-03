@@ -17,8 +17,6 @@ class Game extends Component {
   constructor(props) {
     super(props);
 
-    console.log("GENERATOR");
-
     this.state = {
       cells: [],
       puzzle: [],

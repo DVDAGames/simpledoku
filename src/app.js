@@ -15,43 +15,16 @@ import {
   browserHistory
 } from 'react-router';
 
+import LoadingScreen from './components/Loading-Screen/Loading-Screen';
+import HelpPage from './components/Help-Page/Help-Page';
 import Game from './components/Game/Game';
 import Generator from './components/Generator/Generator';
 
-class App extends Component {
-  render() {
-    return (
-      <section className="simpledoku-app-container">
-        <h1>Simpledoku</h1>
-      </section>
-    );
-  }
-}
-
-class Help extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      testing: true,
-      message: 'Game help goes here'
-    };
-  }
-
-  render() {
-    return (
-      <div className="help-page">
-        { this.state.testing ? <p>{this.state.message}</p> : null }
-      </div>
-    );
-  }
-};
-
 render((
   <Router history={browserHistory}>
-    <Route path="/" component={App} />
+    <Route path="/" component={LoadingScreen} />
     <Route path="/game" component={Game} />
-    <Route path="/game/help" component={Help} />
+    <Route path="/game/help" component={HelpPage} />
     <Route path="/game/generator" component={Generator} />
   </Router>
 ), document.getElementById('main'));
