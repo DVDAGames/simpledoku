@@ -67,7 +67,15 @@ app.on('will-finish-launching', () => {
       handler(request, reply) {
         reply.file('index.html');
       }
-    })
+    });
+
+    server.route({
+      method: 'GET',
+      path: '/game/help',
+      handler(request, reply) {
+        reply.file('index.html');
+      }
+    });
 
     server.route({
       method: 'GET',
