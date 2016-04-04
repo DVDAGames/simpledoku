@@ -1,8 +1,24 @@
 {
   "name": "simpledoku",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Electron app sudoku game built on React",
+  "keywords": [
+    "sudoku",
+    "electron",
+    "game"
+  ],
+  "homepage": "https://github.com/ericrallen/simpledoku",
+  "bugs": "https://github.com/ericrallen/simpledoku/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Eric Allen",
+    "url": "https://www.interwebalchemy.com/"
+  },
   "main": "dist/window.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ericrallen/simpledoku"
+  },
   "scripts": {
     "clean": "cleandir ./dist/",
     "webpack": "webpack --watch",
@@ -16,8 +32,6 @@
     "start": "npm run copy:window & npm run copy:html & npm run copy:services && npm run electron",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.7.4",
     "babel-loader": "^6.2.4",
@@ -44,5 +58,14 @@
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
     "react-router": "^2.0.1"
+  },
+  "engines": {
+    "node": ">=5.x.x"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "react"
+    ]
   }
 }
