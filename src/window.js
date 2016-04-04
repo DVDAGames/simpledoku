@@ -13,6 +13,18 @@ const {
 
 var mainWindow = null;
 
+const server = new Hapi.Server({
+  connections: {
+    routes: {
+      files: {
+        relativeTo: Path.join(__dirname, '')
+      }
+    }
+  }
+});
+
+server.connection({ port: 3333 });
+
 app.on('window-all-closed', () => {
   if(process.platform !== 'darwin') {
     app.quit();
@@ -20,18 +32,6 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-finish-launching', () => {
-  const server = new Hapi.Server({
-    connections: {
-      routes: {
-        files: {
-          relativeTo: Path.join(__dirname, '')
-        }
-      }
-    }
-  });
-
-  server.connection({ port: 3333 });
-
   server.register(require('inert'), (err) => {
     if(err) {
       throw err;
@@ -47,7 +47,7 @@ app.on('will-finish-launching', () => {
 
     server.route({
       method: 'GET',
-      path: '/game',
+      path: '/game/{route}',
       handler(request, reply) {
         reply.file('index.html');
       }
@@ -57,23 +57,7 @@ app.on('will-finish-launching', () => {
       method: 'GET',
       path: '/puzzle',
       handler(request, reply) {
-        reply(PuzzleService.getPuzzle());
-      }
-    });
-
-    server.route({
-      method: 'GET',
-      path: '/game/generator',
-      handler(request, reply) {
-        reply.file('index.html');
-      }
-    });
-
-    server.route({
-      method: 'GET',
-      path: '/game/help',
-      handler(request, reply) {
-        reply.file('index.html');
+        reply(PuzzleService.getPuzzle(request.query.solved));
       }
     });
 
@@ -109,3 +93,9 @@ app.on('ready', () => {
     mainWindow = null;
   });
 });
+
+app.on('will-quit', () => {
+  server.stop({ timeout: 60 * 1000 }, (err) => {
+    console.log('Server stopped');
+  });
+})

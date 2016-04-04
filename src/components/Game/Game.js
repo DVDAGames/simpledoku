@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import _ from 'lodash';
+import { random, keys } from 'lodash';
 import axios from 'axios';
 
 import Grid from '../Grid/Grid';
@@ -21,11 +21,17 @@ class Game extends Component {
     this.state = {
       cells: [],
       puzzle: [],
+      solution: [],
       currentFocus: {},
       puzzleSolved: false,
       playing: false,
       puzzleChecked: false,
-      highlightMode: 0
+      highlightMode: 0,
+      gaveUp: false,
+      hintsUsed: 0,
+      maxHints: 7,
+      solvedPuzzles: [],
+      puzzleID: null
     };
 
     this.keyBoardArrowConstants = {
@@ -58,12 +64,12 @@ class Game extends Component {
         type: 'button',
         action: 'startGame',
         buttonText: {
-          default: 'Play',
+          default: 'New Puzzle',
           playing: 'New Puzzle',
           puzzleSolved: 'New Puzzle'
         },
         visibleStates: {
-          default: true,
+          default: false,
           playing: true,
           puzzleSolved: true
         }
@@ -73,6 +79,17 @@ class Game extends Component {
         type: 'reset',
         action: 'resetPuzzle',
         buttonText: 'Reset Puzzle',
+        visibleStates: {
+          default: false,
+          playing: true,
+          puzzleSolved: false
+        }
+      },
+      {
+        key: 'forfeitBtn',
+        type: 'button',
+        action: 'giveUp',
+        buttonText: 'Show Solution',
         visibleStates: {
           default: false,
           playing: true,
@@ -95,6 +112,12 @@ class Game extends Component {
         type: 'button',
         action: 'getHint',
         buttonText: 'Get Hint',
+        disable: [
+          {
+            check: 'hintsUsed',
+            against: 'maxHints'
+          }
+        ],
         visibleStates: {
           default: false,
           playing: true,
@@ -122,16 +145,28 @@ class Game extends Component {
     this.resetFocus = this.resetFocus.bind(this);
     this.switchHighlightMode = this.switchHighlightMode.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.giveUp = this.giveUp.bind(this);
+
+    this.startGame();
   }
 
   startGame() {
-    const puzzle = axios.get('http://localhost:3333/puzzle')
+    const { solvedPuzzles } = this.state;
+
+    const puzzleString = solvedPuzzles.join(',');
+
+    const puzzle = axios.get(
+      'http://localhost:3333/puzzle',
+      {
+        params: {
+          solved: puzzleString
+        }
+      })
       .then((response) => {
         const cells = response.data.puzzle;
-
-        const generator = new Solver(cells);
-
+        const solution = response.data.solution;
         const puzzle = cloneArray(cells);
+        const puzzleID = response.data.id;
 
         const currentFocus = {
           row: null,
@@ -139,15 +174,30 @@ class Game extends Component {
         };
 
         const playing = true;
+        const gaveUp = false;
         const puzzleSolved = false;
         const puzzleChecked = false;
+        const hintsUsed = 0;
+        const maxHints = 7;
 
-        this.setState({ cells, puzzle, currentFocus, playing, puzzleSolved, puzzleChecked });
+        this.setState({ cells, puzzle, solution, currentFocus, playing, gaveUp, hintsUsed, maxHints, puzzleSolved, puzzleChecked, puzzleID });
       })
       .catch((response) => {
-        console.log('Error Starting Game');
+        alert('You\'ve solved all the puzzles in this version of the game. We\'ll have more soon!');
       })
     ;
+  }
+
+  giveUp(e) {
+    let { cells, solution, puzzleID, solvedPuzzles } = this.state;
+
+    const gaveUp = true;
+    const puzzleSolved = true;
+    solvedPuzzles.push(puzzleID);
+
+    cells = solution;
+
+    this.setState({ cells, gaveUp, puzzleSolved, solvedPuzzles });
   }
 
   onSubmit(e) {
@@ -157,17 +207,19 @@ class Game extends Component {
   }
 
   checkSolution() {
+    const { solvedPuzzles, puzzleID } = this.state;
     const puzzleChecked = true;
     const puzzleSolved = new Solver(this.state.cells).checkSolution();
     let playing = true;
 
     if(puzzleSolved) {
+      solvedPuzzles.push(puzzleID);
       playing = false;
     } else {
       this.resetFocus();
     }
 
-    this.setState({ puzzleSolved, playing, puzzleChecked });
+    this.setState({ puzzleSolved, playing, puzzleChecked, solvedPuzzles });
   }
 
   puzzleCheckedState(puzzleChecked) {
@@ -184,10 +236,35 @@ class Game extends Component {
     this.resetFocus();
   }
 
-  getHint() {
-    console.log('Give user hint');
+  generateHint(cells) {
+    let cell = {};
+    cell.row = random(0, cells.length - 1);
+    cell.col = random(0, cells[cell.row].length - 1);
 
-    this.resetFocus();
+    while(cells[cell.row][cell.col] !== 0) {
+      cell = this.generateHint(cells);
+    }
+
+    return cell;
+  }
+
+  getHint() {
+    let { solution, cells, puzzle, hintsUsed, maxHints, currentFocus } = this.state;
+
+    if(hintsUsed < maxHints) {
+      currentFocus = this.generateHint(cells);
+
+      cells[currentFocus.row][currentFocus.col] = solution[currentFocus.row][currentFocus.col];
+      puzzle[currentFocus.row][currentFocus.col] = solution[currentFocus.row][currentFocus.col];
+
+      hintsUsed = hintsUsed + 1;
+
+      this.setState({ cells, puzzle, hintsUsed });
+
+      this.setCurrentFocus(currentFocus.row, currentFocus.col, true);
+    } else {
+      alert('All hints used.');
+    }
   }
 
   switchHighlightMode(row, col, currentMode = this.state.highlightMode) {
@@ -290,8 +367,6 @@ class Game extends Component {
       constants = this.keyBoardWASDConstants;
     }
 
-    console.log(key);
-
     if(objectHasOwnValue(constants, key)) {
       const { row, col } = this.state.currentFocus;
 
@@ -307,11 +382,12 @@ class Game extends Component {
 
   render() {
     const buttons = this.buttonArray.map((button) => {
-      let { key, action, buttonText, visibleStates, type } = button;
+      let { key, action, buttonText, visibleStates, type, disable } = button;
 
-      const visibleStatesArray = _.keys(visibleStates);
+      const visibleStatesArray = keys(visibleStates);
 
       let displayButton = false;
+      let disableButton = false;
 
       if(this.state.puzzleSolved && buttonText.hasOwnProperty('puzzleSolved')) {
         buttonText = buttonText.puzzleSolved;
@@ -335,8 +411,16 @@ class Game extends Component {
         });
       }
 
+      if(disable) {
+        disableButton = disable.some((parameters) => {
+          if(this.state[parameters.check] === this.state[parameters.against]) {
+            return true;
+          }
+        });
+      }
+
       if(displayButton) {
-        return <GameButton key={key} ref={key} action={this[action]} buttonText={buttonText} type={type} />
+        return <GameButton key={key} ref={key} action={this[action]} buttonText={buttonText} type={type} disableButton={disableButton} />
       }
     });
 

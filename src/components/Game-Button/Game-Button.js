@@ -10,10 +10,10 @@ class GameButton extends Component {
   }
 
   render() {
-    const { key, action, buttonText, type } = this.props;
+    const { key, action, buttonText, type, disableButton } = this.props;
 
     return (
-      <input type={type} className="simpledoku-button" key={key} onClick={action.bind(this)} value={buttonText} />
+      <input type={type} className="simpledoku-button" key={key} onClick={action.bind(this)} value={buttonText} disabled={disableButton} />
     );
   }
 };

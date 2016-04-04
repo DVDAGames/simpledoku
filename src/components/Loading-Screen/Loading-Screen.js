@@ -6,7 +6,7 @@ class LoadingScreen extends Component {
   componentDidMount() {
     setTimeout(
       function() {
-        this.props.history.push('/game');
+        this.props.history.push('/game/menu');
       }.bind(this),
       5000
     );

@@ -5,7 +5,7 @@
   "main": "dist/window.js",
   "scripts": {
     "clean": "cleandir ./dist/",
-    "webpack": "webpack",
+    "webpack": "webpack --watch",
     "copy:window": "cp ./src/window.js ./dist/window.js",
     "copy:html": "cp ./src/index.html ./dist/index.html",
     "copy:services": "rm -rf ./dist/services && mkdir ./dist/services && cp ./src/services/puzzle.js ./dist/services/puzzle.js",
