@@ -7,8 +7,8 @@
     "electron",
     "game"
   ],
-  "homepage": "https://github.com/ericrallen/simpledoku",
-  "bugs": "https://github.com/ericrallen/simpledoku/issues",
+  "homepage": "https://github.com/dvdagames/simpledoku",
+  "bugs": "https://github.com/dvdagames/simpledoku/issues",
   "license": "MIT",
   "author": {
     "name": "Eric Allen",
@@ -17,7 +17,7 @@
   "main": "window.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ericrallen/simpledoku"
+    "url": "https://github.com/dvdagames/simpledoku"
   },
   "scripts": {
     "clean": "rm -rf ../dist/$npm_package_version",
@@ -42,7 +42,7 @@
   },
   "electron": {
     "appName": "Simpledoku",
-    "appCopyright": "Copyright 2016",
+    "appCopyright": "Copyright 2016 Dead Villager Dead Adventurer Games",
     "appBundleId": "com.dvdagames.simpledoku" ,
     "appCategoryType": "public.app-category.games",
     "helperBundleId": "com.dvdagames.simpledoku-helper"
