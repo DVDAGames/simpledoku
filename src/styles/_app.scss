@@ -217,7 +217,7 @@ body,
     margin: 0;
     background: #fff;
     text-align: center;
-    transition: opacity 0.3s ease, background 0.3s ease, color 0.3s ease, border 0.3s ease;
+    transition: all 0.3s ease;
 
     &--highlight {
       > [type=number] {
@@ -246,7 +246,7 @@ body,
       text-shadow: 0 0 0 #232323;
       cursor: default;
       z-index: 1;
-      transition: all 0.3s ease;
+      transition: background 0.3s ease;
       cursor: pointer;
 
       -webkit-appearance: none;

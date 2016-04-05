@@ -3,8 +3,8 @@ import { random, keys } from 'lodash';
 import axios from 'axios';
 
 import Grid from '../Grid/Grid';
-import GameButton from '../Game-Button/Game-Button';
-import HintCounter from '../Hint-Counter/Hint-Counter';
+import GameButton from '../GameButton/GameButton';
+import HintCounter from '../HintCounter/HintCounter';
 
 import Solver from '../../utilities/solver';
 

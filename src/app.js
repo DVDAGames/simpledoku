@@ -15,10 +15,10 @@ import {
   browserHistory
 } from 'react-router';
 
-import LoadingScreen from './components/Loading-Screen/Loading-Screen';
-import MenuScreen from './components/Menu-Screen/Menu-Screen';
-import HelpPage from './components/Help-Page/Help-Page';
-import AboutPage from './components/About-Page/About-Page';
+import LoadingScreen from './components/LoadingScreen/LoadingScreen';
+import MenuScreen from './components/MenuScreen/MenuScreen';
+import HelpPage from './components/HelpPage/HelpPage';
+import AboutPage from './components/AboutPage/AboutPage';
 import Game from './components/Game/Game';
 import Generator from './components/Generator/Generator';
 

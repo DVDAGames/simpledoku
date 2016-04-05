@@ -1,6 +1,6 @@
 {
   "name": "simpledoku",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Electron app sudoku game built on React",
   "keywords": [
     "sudoku",
@@ -20,7 +20,9 @@
     "url": "https://github.com/ericrallen/simpledoku"
   },
   "scripts": {
-    "package": "electron-packager . Simpledoku --all --asar --out=../dist"
+    "clean": "rm -rf ../dist/$npm_package_version",
+    "package:osx": "electron-packager . $npm_package_electron_appName --platform=darwin --arch=x64 --asar --out=\"../dist/$npm_package_version\" --app-version=$npm_package_version --app-copyright=$npm_package_electron_appCopyright --app-bundle-id=$npm_package_electron_appBundleId --app-helper-id=$npm_package_electron_appBundleId --app-categoy-type=$npm_package_electron_appCategoyType",
+    "package": "npm run clean && npm run package:osx"
   },
   "devDependencies": {
     "electron-packager": "^6.0.0",
@@ -37,5 +39,12 @@
   },
   "engines": {
     "node": ">=5.x.x"
+  },
+  "electron": {
+    "appName": "Simpledoku",
+    "appCopyright": "Copyright 2016",
+    "appBundleId": "com.dvdagames.simpledoku" ,
+    "appCategoryType": "public.app-category.games",
+    "helperBundleId": "com.dvdagames.simpledoku-helper"
   }
 }

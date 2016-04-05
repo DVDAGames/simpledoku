@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 
 import Grid from '../Grid/Grid';
-import GameButton from '../Game-Button/Game-Button';
+import GameButton from '../GameButton/GameButton';
 
 import Solver from '../../utilities/solver';
 
