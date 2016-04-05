@@ -1,4 +1,4 @@
-# simpledoku 0.1.0
+# simpledoku 0.2.0
 
 **This project is still under construction and is in need of some fixes and some serious refactoring.**
 
