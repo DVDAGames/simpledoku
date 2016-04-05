@@ -6,6 +6,8 @@ It's mostly just an exploration of React and Electron, but the concepts learned 
 
 Right now it just builds a standalone `Simpledoku.app` file for OS X. Future updates will branch out to include a Mac App Store version and a Windows version.
 
+You can download the latest Proof of Concept version from the [current release page](https://github.com/DVDAGames/simpledoku/releases/tag/0.2.0).
+
 ## Building
 
 1. Perform a `git clone` of this repo
