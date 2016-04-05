@@ -1,5 +1,3 @@
-'use strict';
-
 const { random, filter } = require('lodash');
 
 const PuzzleService = {
@@ -27,7 +25,7 @@ const PuzzleService = {
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 4, 0, 0, 2, 3, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0]
-      ],
+      ]
     },
     {
       id: 2,
@@ -133,16 +131,22 @@ const PuzzleService = {
   getPuzzle(solved) {
     const solvedArray = solved.split(',');
 
-    solvedArray.forEach((item, index, array) => {
-      array[index] = parseInt(item, 10);
+    solvedArray.forEach((item, index) => {
+      solvedArray[index] = parseInt(item, 10);
     });
 
-    const puzzles = filter(this.puzzles, (o) => {
-      return solvedArray.indexOf(o.id) === -1;
+    const puzzles = filter(this.puzzles, (obj) => {
+      return solvedArray.indexOf(obj.id) === -1;
     });
 
-    return puzzles[random(0, puzzles.length - 1)];
+    const randomPuzzle = puzzles[random(0, puzzles.length - 1)];
+
+    if(randomPuzzle) {
+      randomPuzzle.totalPuzzles = this.puzzles.length;
+    }
+
+    return randomPuzzle;
   }
-}
+};
 
 module.exports = PuzzleService;

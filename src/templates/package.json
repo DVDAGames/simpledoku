@@ -1,0 +1,41 @@
+{
+  "name": "simpledoku",
+  "version": "0.1.0",
+  "description": "Electron app sudoku game built on React",
+  "keywords": [
+    "sudoku",
+    "electron",
+    "game"
+  ],
+  "homepage": "https://github.com/ericrallen/simpledoku",
+  "bugs": "https://github.com/ericrallen/simpledoku/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Eric Allen",
+    "url": "https://www.interwebalchemy.com/"
+  },
+  "main": "window.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ericrallen/simpledoku"
+  },
+  "scripts": {
+    "package": "electron-packager . Simpledoku --all --asar --out=../dist"
+  },
+  "devDependencies": {
+    "electron-packager": "^6.0.0",
+    "electron-prebuilt": "^0.37.2"
+  },
+  "dependencies": {
+    "axios": "^0.9.1",
+    "hapi": "^13.2.2",
+    "inert": "^3.2.0",
+    "lodash": "^4.6.1",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7",
+    "react-router": "^2.0.1"
+  },
+  "engines": {
+    "node": ">=5.x.x"
+  }
+}

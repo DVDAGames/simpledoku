@@ -1,11 +1,10 @@
-'use strict';
-
 import React, { Component } from 'react';
 import { random, keys } from 'lodash';
 import axios from 'axios';
 
 import Grid from '../Grid/Grid';
 import GameButton from '../Game-Button/Game-Button';
+import HintCounter from '../Hint-Counter/Hint-Counter';
 
 import Solver from '../../utilities/solver';
 
@@ -31,7 +30,8 @@ class Game extends Component {
       hintsUsed: 0,
       maxHints: 7,
       solvedPuzzles: [],
-      puzzleID: null
+      puzzleID: null,
+      totalPuzzles: null
     };
 
     this.keyBoardArrowConstants = {
@@ -64,9 +64,9 @@ class Game extends Component {
         type: 'button',
         action: 'startGame',
         buttonText: {
-          default: 'New Puzzle',
-          playing: 'New Puzzle',
-          puzzleSolved: 'New Puzzle'
+          default: 'New',
+          playing: 'New',
+          puzzleSolved: 'New'
         },
         visibleStates: {
           default: false,
@@ -78,7 +78,7 @@ class Game extends Component {
         key: 'resetBtn',
         type: 'reset',
         action: 'resetPuzzle',
-        buttonText: 'Reset Puzzle',
+        buttonText: 'Reset',
         visibleStates: {
           default: false,
           playing: true,
@@ -89,7 +89,7 @@ class Game extends Component {
         key: 'forfeitBtn',
         type: 'button',
         action: 'giveUp',
-        buttonText: 'Show Solution',
+        buttonText: 'Give Up',
         visibleStates: {
           default: false,
           playing: true,
@@ -100,7 +100,7 @@ class Game extends Component {
         key: 'solveBtn',
         type: 'submit',
         action: 'onSubmit',
-        buttonText: 'Check Solution',
+        buttonText: 'Check',
         visibleStates: {
           default: false,
           playing: true,
@@ -111,7 +111,7 @@ class Game extends Component {
         key: 'hintBtn',
         type: 'button',
         action: 'getHint',
-        buttonText: 'Get Hint',
+        buttonText: 'Hint',
         disable: [
           {
             check: 'hintsUsed',
@@ -130,6 +130,7 @@ class Game extends Component {
       'none',
       'row',
       'col',
+      'cross',
       'section'
     ];
 
@@ -151,11 +152,19 @@ class Game extends Component {
   }
 
   startGame() {
-    const { solvedPuzzles } = this.state;
+    const { puzzleID, solvedPuzzles, totalPuzzles, puzzleSolved } = this.state;
 
-    const puzzleString = solvedPuzzles.join(',');
+    const solvedPuzzleArray = cloneArray(solvedPuzzles);
 
-    const puzzle = axios.get(
+    if(totalPuzzles) {
+      if(solvedPuzzleArray.indexOf(puzzleID) === -1 && !puzzleSolved) {
+        solvedPuzzleArray.push(puzzleID);
+      }
+    }
+
+    const puzzleString = solvedPuzzleArray.join(',');
+
+    axios.get(
       'http://localhost:3333/puzzle',
       {
         params: {
@@ -163,6 +172,7 @@ class Game extends Component {
         }
       })
       .then((response) => {
+        const totalPuzzles = response.data.totalPuzzles;
         const cells = response.data.puzzle;
         const solution = response.data.solution;
         const puzzle = cloneArray(cells);
@@ -180,10 +190,12 @@ class Game extends Component {
         const hintsUsed = 0;
         const maxHints = 7;
 
-        this.setState({ cells, puzzle, solution, currentFocus, playing, gaveUp, hintsUsed, maxHints, puzzleSolved, puzzleChecked, puzzleID });
+        this.setState({ cells, puzzle, solution, currentFocus, playing, gaveUp, hintsUsed, maxHints, puzzleSolved, puzzleChecked, puzzleID, totalPuzzles });
+
+        this.resetFocus();
       })
       .catch((response) => {
-        alert('You\'ve solved all the puzzles in this version of the game. We\'ll have more soon!');
+        window.alert('You\'ve solved all the puzzles in this version of the game. We\'ll have more soon!');
       })
     ;
   }
@@ -425,14 +437,15 @@ class Game extends Component {
     });
 
     return (
-      <div className="simpledoku-game"  onKeyDown={this.onKeyPress}>
+      <div className="simpledoku-game" onKeyDown={this.onKeyPress}>
         <h1>Simpledoku</h1>
         <form autoComplete="off" noValidate onSubmit={this.onSubmit}>
           <Grid ref="game" { ...this.state } startGame={this.startGame} onKeyPress={this.onKeyPress} setValue={this.setValue} resetFocus={this.resetFocus} moveFocus={this.moveFocus} setCurrentFocus={this.setCurrentFocus} switchHighlightMode={this.switchHighlightMode} getHint={this.getHint} resetPuzzle={this.resetPuzzle} puzzleCheckedState={this.puzzleCheckedState} checkSolution={this.checkSolution} highlightModes={this.highlightModes} keyBoardWASDConstants={this.keyBoardWASDConstants} keyBoardArrowConstants={this.keyBoardArrowConstants} keyBoardOtherConstants={this.keyBoardOtherConstants} inputValues={this.inputValues} />
-
-          { buttons }
-
+          <div className="simpledoku-game-buttons">
+            { buttons }
+          </div>
         </form>
+        <HintCounter hintsUsed={this.state.hintsUsed} maxHints={this.state.maxHints} />
       </div>
     );
   }

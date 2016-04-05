@@ -1,7 +1,5 @@
 $bg: #f7f7f7;
 
-
-
 html {
   box-sizing: border-box;
 }
@@ -14,6 +12,7 @@ html {
 }
 
 body {
+  max-width: 600px;
   background: $bg;
   text-align: center;
   margin: 0 auto;
@@ -99,6 +98,43 @@ body,
   &-game {
     position: relative;
     width: 100%;
+
+    &-buttons {
+      margin-top: 30px;
+    }
+
+    &-button {
+      padding: 10px 20px;
+      border: 1px solid rgba(30, 172, 240, 0.52);
+      margin-right: 10px;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      -webkit-appearance: none;
+      appearance: not-allowed;
+
+      &:hover {
+        background: rgba(30, 172, 240, 1.0);
+      }
+
+    &:focus {
+      outline: none;
+    }
+
+      &[disabled] {
+        opacity: 0.25;
+
+        &:hover {
+          background: transparent;
+          cursor: disabled;
+        }
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
   }
 
   &-grid {
@@ -181,6 +217,7 @@ body,
     margin: 0;
     background: #fff;
     text-align: center;
+    transition: opacity 0.3s ease, background 0.3s ease, color 0.3s ease, border 0.3s ease;
 
     &--highlight {
       > [type=number] {
@@ -204,8 +241,13 @@ body,
       padding: 10px 0;
       border: none;
       margin: 0 auto;
+      color: transparent;
       text-align: center;
+      text-shadow: 0 0 0 #232323;
+      cursor: default;
       z-index: 1;
+      transition: all 0.3s ease;
+      cursor: pointer;
 
       -webkit-appearance: none;
 
@@ -219,9 +261,13 @@ body,
         z-index: 2;
       }
 
-      &[readonly]:focus {
-        background: #e7e7e7;
-        outline: none;
+      &[readonly] {
+        cursor: default;
+
+        &:focus {
+          background: #e7e7e7;
+          outline: none;
+        }
       }
 
       &::-webkit-inner-spin-button,
@@ -229,6 +275,19 @@ body,
         -webkit-appearance: none;
         margin: 0;
       }
+    }
+  }
+
+  &-hint-counter {
+    position: fixed;
+    right: 5%;
+    top: 24px;
+    padding: 9px;
+    background: #e7e7e7;
+    border: 1px solid #ccc;
+
+    > label {
+      font-weight: bold;
     }
   }
 }

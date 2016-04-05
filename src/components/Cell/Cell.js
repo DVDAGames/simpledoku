@@ -105,6 +105,12 @@ class Cell extends Component {
 
           break;
         case 3:
+          if(row === currentFocus.row || col === currentFocus.col) {
+            tdClassNames.push('simpledoku-cell--highlight');
+          }
+
+          break;
+        case 4:
           const currentRow = currentFocus.row;
           const currentCol = currentFocus.col;
 

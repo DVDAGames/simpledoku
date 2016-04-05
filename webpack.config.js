@@ -9,10 +9,10 @@ module.exports = {
     app: './src/app.js'
   },
   output: {
-    path: path.join(__dirname, 'dist/assets'),
+    path: path.join(__dirname, 'app/assets'),
     filename: '[name].js'
   },
-  watch: true,
+  watch: false,
   module: {
     loaders: [
       {
@@ -34,7 +34,6 @@ module.exports = {
     new ExtractTextPlugin('app.css', {
       allChunks: true
     }),
-    //new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin(new RegExp("^(fs|ipc)$"))
   ]
 };

@@ -81,13 +81,11 @@ app.on('will-finish-launching', () => {
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 530,
     height: 600
   });
 
   mainWindow.loadURL('http://localhost:3333/');
-
-  mainWindow.webContents.openDevTools();
 
   mainWindow.on('closed', () => {
     mainWindow = null;

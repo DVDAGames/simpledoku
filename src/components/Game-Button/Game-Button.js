@@ -13,7 +13,7 @@ class GameButton extends Component {
     const { key, action, buttonText, type, disableButton } = this.props;
 
     return (
-      <input type={type} className="simpledoku-button" key={key} onClick={action.bind(this)} value={buttonText} disabled={disableButton} />
+      <input type={type} className="simpledoku-game-button" key={key} onClick={action.bind(this)} value={buttonText} disabled={disableButton} />
     );
   }
 };
