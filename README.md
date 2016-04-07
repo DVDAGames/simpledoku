@@ -1,4 +1,4 @@
-# simpledoku 0.2.0
+# simpledoku 0.2.1
 
 `simpledoku` is a basic, desktop Sudoku game prototype built with React, Electron, Babel, and Webpack.
 
@@ -23,13 +23,12 @@ You can download the latest Proof of Concept version from the [current release p
 1. Run `npm run generate`
 1. Run `cd app`
 1. Run `npm install`
-1. Run `npm package`
+1. Run `npm run package`
 
 Built application files can be found in `simpledoku/dist/[current version number]/Simpledoku-darwin-x64`.
 
 ## Roadmap
 
-- **Help & About** - Actually fill out the help and about pages with real information and allow user to go back to the menu screen
 - **Persistent Solved State** - Store solved puzzle ids somewhere so that when the user returns we can serve up new puzzles and not stale ones
 - **Better Solver/Generator** - Need to learn more about Dancing Links/Algorithm X and implement a much more efficient solver for puzzle generation, a more efficient solver could generate and store batches of puzzles for later use
 - **Puzzle Database** - Replace `PuzzleService` with DB that stores puzzles and that we can inject new puzzles into
@@ -40,3 +39,6 @@ Built application files can be found in `simpledoku/dist/[current version number
 - **Standalone Solver** - Allow user to input a puzzle and provide the solution
 - **Interface** - Update the interface so that it is much more attractive
 - **App Icon** - Add custom icons
+- **Interaction Sounds** - Add sounds to button hover states, successful puzzle solution, incorrect puzzle solution, interactive cell focus, non-interactive cell focus, etc.
+- **Sound Options** - Add menu for setting volume levels of BG and UI sounds. Add more BG music
+- **Integrated Player** - Allow user to cycle through BG music and play/pause and mute/unmute it

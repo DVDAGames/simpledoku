@@ -1,6 +1,6 @@
 {
   "name": "simpledoku",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Electron app sudoku game built on React",
   "keywords": [
     "sudoku",
@@ -24,14 +24,15 @@
     "copy:main": "cp ./src/window.js ./app/window.js",
     "copy:html": "cp ./src/index.html ./app/index.html",
     "copy:services": "rm -rf ./app/services && mkdir ./app/services && cp ./src/services/puzzle.js ./app/services/puzzle.js",
-    "copy:templates": "cp ./src/templates/package.json ./app/package.json",
+    "copy:music": "cp -rf ./src/assets/music/ ./app/assets",
+    "copy:templates": "cp ./src/templates/app.package.json ./app/package.json",
     "electron": "electron .",
     "server": "node ./app/server.js",
     "watch": "webpack --watch",
     "eslint": "npm run lint",
     "build": "npm run clean && webpack -p",
-    "generate": "npm run copy:main & npm run copy:html & npm run copy:services & npm run copy:templates",
-    "start": "npm run copy:main & npm run copy:html & npm run copy:services & npm run copy:templates && npm run electron",
+    "generate": "npm run copy:main & npm run copy:html & npm run copy:services & npm run copy:templates & npm run copy:music",
+    "start": "npm run generate && npm run electron",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
@@ -60,6 +61,7 @@
     "hapi": "^13.2.2",
     "inert": "^3.2.0",
     "lodash": "^4.6.1",
+    "open": "0.0.5",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
     "react-router": "^2.0.1"
@@ -77,7 +79,10 @@
     "root": true,
     "extends": "eslint-config-es2015-react/base",
     "rules": {
-      "comma-dangle": [2, "never"]
+      "comma-dangle": [
+        2,
+        "never"
+      ]
     }
   }
 }

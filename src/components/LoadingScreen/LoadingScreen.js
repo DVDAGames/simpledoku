@@ -2,14 +2,18 @@
 
 import React, { Component } from 'react';
 
+const audioSrc = 'http://localhost:3333/assets/Incompetech_-_The_Lift.mp3';
+
 class LoadingScreen extends Component {
   componentDidMount() {
-    setTimeout(
-      function() {
-        this.props.history.push('/game/menu');
-      }.bind(this),
-      5000
-    );
+    const audio = document.createElement('audio');
+
+    //preload menu BG music
+    audio.oncanplaythrough = () => {
+      this.props.history.push('/game/menu');
+    };
+
+    audio.src = audioSrc;
   }
 
   render() {

@@ -290,4 +290,11 @@ body,
       font-weight: bold;
     }
   }
+
+  &-back-button {
+    position: fixed;
+    right: 5%;
+    top: 24px;
+    padding: 9px;
+  }
 }

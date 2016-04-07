@@ -3,6 +3,7 @@
 const electron = require('electron');
 const Hapi = require('hapi');
 const Path = require('path');
+const open = require('open');
 
 const PuzzleService= require('./services/puzzle');
 
@@ -65,7 +66,7 @@ app.on('will-finish-launching', () => {
       method: 'GET',
       path: '/assets/{filename}',
       handler(request, reply) {
-        reply.file(`assets/${request.params.filename}`)
+        reply.file(`assets/${request.params.filename}`);
       }
     });
 
@@ -90,10 +91,16 @@ app.on('ready', () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  mainWindow.on('new-window', (event, url) => {
+    event.preventDefault();
+
+    open(url);
+  });
 });
 
 app.on('will-quit', () => {
   server.stop({ timeout: 60 * 1000 }, (err) => {
     console.log('Server stopped');
   });
-})
+});

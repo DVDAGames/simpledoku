@@ -5,6 +5,7 @@ import axios from 'axios';
 import Grid from '../Grid/Grid';
 import GameButton from '../GameButton/GameButton';
 import HintCounter from '../HintCounter/HintCounter';
+import BGMusic from '../BGMusic/BGMusic';
 
 import Solver from '../../utilities/solver';
 
@@ -446,6 +447,7 @@ class Game extends Component {
           </div>
         </form>
         <HintCounter hintsUsed={this.state.hintsUsed} maxHints={this.state.maxHints} />
+        <BGMusic track="http://localhost:3333/assets/Quarkstar_-_Intuition.mp3" />
       </div>
     );
   }
